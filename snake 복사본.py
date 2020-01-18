@@ -71,16 +71,17 @@ class Oblstacle:
         self.position = []
 
         for i in range(SCREEN_HEIGHT):
-            self.position.append((i, SCREEN_WIDTH))
+            self.position.append((i, SCREEN_WIDTH/BLOCK_SIZE-1))
             self.position.append((i, 0))
 
         for k in range(SCREEN_WIDTH):
-            self.position.append((SCREEN_HEIGHT, k))
+            self.position.append((SCREEN_HEIGHT/BLOCK_SIZE-1, k))
             self.position.append((0, k))
 
     def draw(self, screen):
         """장애물을 화면에 그린다."""
-        draw_blcok(screen, self.color, self.position)
+        for position in self.position:
+            draw_block(screen, self.color, position)
 
 class Apple:
     """사과 클래스"""
@@ -108,6 +109,7 @@ class GameBoard:
         """화면에 게임판의 구성요소를 그린다."""
         self.apple.draw(screen)  # 게임판 위의 사과를 그린다
         self.snake.draw(screen)  # 게임판 위의 뱀을 그린다
+        self.oblstacle.draw(screen) # 게임판 위의 장애물을 그린
 
 
     def process_turn(self):
@@ -149,7 +151,7 @@ class GameBoard:
             raise SnakeCollisionException()   # 뱀 충돌 예외를 일으킨다
 
 
-class SnakeCollisionExceptio(Exception):
+class SnakeCollisionException(Exception):
     """뱀 충돌 예외"""
     pass
 

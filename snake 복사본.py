@@ -28,7 +28,7 @@ class Snake:
         self.positions = [(9, 6), (9, 7), (9, 8), (9, 9)]  # 뱀의 위치
         self.direction = 'north'  # 뱀의 방향
 
-    def draw(self, screen):
+    def draw(self, \screen):
         """뱀을 화면에 그린다."""
         for position in self.positions:  # 뱀의 몸 블록들을 순회하며
             draw_block(screen, self.color, position)  # 각 블록을 그린다
@@ -65,7 +65,7 @@ class Snake:
 
 class Oblstacle:
     """장애물 클래스"""
-    color = BLACK
+    color = GRAY
 
     def __init__(self):
         self.position = []
@@ -150,6 +150,10 @@ class GameBoard:
         if self.snake.positions[0] in self.oblstacle.position:
             raise SnakeCollisionException()   # 뱀 충돌 예외를 일으킨다
 
+        # 사과가 장애물과 접촉시
+        if self.apple.position in self.oblstacle.position:
+            self.put_new_apple()
+
 
 class SnakeCollisionException(Exception):
     """뱀 충돌 예외"""
@@ -174,16 +178,7 @@ pygame.init()
 # 지정한 크기의 게임 화면 창을 연다.
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-draw_background(screen)
-draw_block(screen, RED, (1, 1))
-draw_block(screen, RED, (3, 1))
-draw_block(screen, RED, (5, 1))
-draw_block(screen, RED, (7, 1))
-draw_block(screen, GREEN, (12, 10))
-draw_block(screen, GREEN, (12, 11))
-draw_block(screen, GREEN, (12, 12))
-draw_block(screen, GREEN, (12, 13))
-pygame.display.update()
+
 
 block_position = [0, 0]  # 블록의 위치 (y, x)
 last_moved_time = datetime.now()  # 마지막으로 블록을 움직인 때
@@ -203,7 +198,7 @@ last_turn_time = datetime.now()
 
 game_board = GameBoard()  # 게임판 인스턴스를 생성한다
 
-TURN_INTERVAL = timedelta(seconds=0.3)  # 게임 진행 간격을 0.3초로 정의한다
+TURN_INTERVAL = timedelta(seconds=0.1)  # 게임 진행 간격을 0.1초로 정의한다
 
 while True:
     events = pygame.event.get()

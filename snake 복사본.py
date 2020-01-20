@@ -28,7 +28,7 @@ class Snake:
         self.positions = [(9, 6), (9, 7), (9, 8), (9, 9)]  # 뱀의 위치
         self.direction = 'north'  # 뱀의 방향
 
-    def draw(self, \screen):
+    def draw(self, screen):
         """뱀을 화면에 그린다."""
         for position in self.positions:  # 뱀의 몸 블록들을 순회하며
             draw_block(screen, self.color, position)  # 각 블록을 그린다
@@ -63,8 +63,8 @@ class Snake:
         elif self.direction == 'east':
             self.positions.append((y, x + 1))
 
-class Oblstacle:
-    """장애물 클래스"""
+class Wall:
+    """벽 클래스"""
     color = GRAY
 
     def __init__(self):
@@ -83,17 +83,29 @@ class Oblstacle:
         for position in self.position:
             draw_block(screen, self.color, position)
 
+class Obstacle:
+    """장애물 클래스"""
+
 class Apple:
     """사과 클래스"""
     color = RED  # 사과의 색
+    apple_count = 0
 
     def __init__(self, position=(5, 5)):
+
         self.position = position  # 사과의 위치
+        self.apple_count = 0 # 사과 카운트 초기화
+
 
     def draw(self, screen):
         """사과를 화면에 그린다."""
         draw_block(screen, self.color, self.position)
 
+    def count(self):
+        self.apple_count += 1
+
+    def decount(self):
+        self.apple_count -= 1
 
 class GameBoard:
     """게임판 클래스"""
@@ -103,13 +115,13 @@ class GameBoard:
     def __init__(self):
         self.snake = Snake()  # 게임판 위의 뱀
         self.apple = Apple()  # 게임판 위의 사과
-        self.oblstacle =Oblstacle() # 게임판 위의 장애물
+        self.wall =Wall() # 게임판 위의 장애물
 
     def draw(self, screen):
         """화면에 게임판의 구성요소를 그린다."""
         self.apple.draw(screen)  # 게임판 위의 사과를 그린다
         self.snake.draw(screen)  # 게임판 위의 뱀을 그린다
-        self.oblstacle.draw(screen) # 게임판 위의 장애물을 그린
+        self.wall.draw(screen) # 게임판 위의 장애물을 그린
 
 
     def process_turn(self):
@@ -131,6 +143,7 @@ class GameBoard:
         for position in self.snake.positions:  # ❸ 뱀 블록을 순회하면서
             if self.apple.position == position:  # 사과가 뱀 위치에 놓인 경우를 확인해
                 self.put_new_apple()  # 사과를 새로 놓는다
+                self.apple.count() # 사과 카운트를 하나 증가시킨다
                 break
 
     def process_turn(self):
@@ -147,12 +160,14 @@ class GameBoard:
             self.put_new_apple()
 
         # 뱀의 머리가 벽과 부딛혓으면
-        if self.snake.positions[0] in self.oblstacle.position:
+        if self.snake.positions[0] in self.wall.position:
             raise SnakeCollisionException()   # 뱀 충돌 예외를 일으킨다
 
-        # 사과가 장애물과 접촉시
-        if self.apple.position in self.oblstacle.position:
+        # 사과가 벽과 접촉시
+        if self.apple.position in self.wall.position:
             self.put_new_apple()
+            self.apple.decount()
+
 
 
 class SnakeCollisionException(Exception):

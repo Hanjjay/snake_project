@@ -4,7 +4,7 @@ from datetime import datetime
 from datetime import timedelta
 
 '''
-해야할것
+해야할
 1.p를 누를시 게임정지
 2.r를 누를시 게임 리스타트
 3.벽탈출
@@ -141,18 +141,19 @@ class GameBoard:
         self.wall.draw(screen) # 게임판 위의 장애물을 그린
 
     def count_apple(self):
+        """사과 카운트 하나증가"""
         self.apple_count += 1
 
     def decount_apple(self):
+        """사과 카운트 하나 감소"""
         self.apple_count -= 1
 
     def put_new_apple(self):
         """게임판에 새 사과를 놓는다."""
-        self.apple = Apple((random.randint(4, 25), random.randint(0, 20)))
+        self.apple = Apple((random.randint(3, 25), random.randint(1, 18)))
         for position in self.snake.positions:  # ❸ 뱀 블록을 순회하면서
             if self.apple.position == position:  # 사과가 뱀 위치에 놓인 경우를 확인해
                 self.put_new_apple()  # 사과를 새로 놓는다
-                self.count_apple()  # 사과 카운트를 하나 증가시킨다
                 break
 
 
@@ -167,8 +168,9 @@ class GameBoard:
 
         # 뱀의 머리가 사과를 먹으면
         if self.snake.positions[0] == self.apple.position:
-            self.snake.grow()
-            self.put_new_apple()
+            self.snake.grow()  # 뱀을 자라게 한다
+            self.put_new_apple()  # 새로운 사과를 나둔다
+            self.count_apple()  # 카운트 하나 증가시킨다
 
         # 뱀의 머리가 벽과 부딛혓으면
         if self.snake.positions[0] in self.wall.position:
@@ -179,11 +181,6 @@ class GameBoard:
             self.put_new_apple()
             self.decount_apple()
 
-
-        if self.snake.positions[0] == self.apple.position:
-            self.snake.grow()  # 뱀을 한 칸 자라게 한다
-            self.put_new_apple()  # 사과를 새로 놓는다
-            self.decount_apple() # 사과 카운트를 하나 깎는다
 
 
 

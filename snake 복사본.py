@@ -7,9 +7,8 @@ from datetime import timedelta
 해야할
 1.p를 누를시 게임정지
 2.r를 누를시 게임 리스타트
-3.벽탈출
-4.점수 올리기
-5.뭐야 내사과 돌려줘요
+
+
 '''
 
 # 여러 가지 색
@@ -26,6 +25,7 @@ SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 540
 BLOCK_SIZE = 20
 
+
 # 뱀 게임에서 사용할 데이터 모델 정의하기
 
 
@@ -37,10 +37,10 @@ class Snake:
         self.positions = [(9, 6), (9, 7), (9, 8), (9, 9)]  # 뱀의 위치
         self.direction = 'north'  # 뱀의 방향
 
-    def draw(self, screen):
+    def draw(self, vIew_screen):
         """뱀을 화면에 그린다."""
         for position in self.positions:  # 뱀의 몸 블록들을 순회하며
-            draw_block(screen, self.color, position)  # 각 블록을 그린다
+            draw_block(vIew_screen, self.color, position)  # 각 블록을 그린다
 
     def crawl(self):
         """뱀이 현재 방향으로 한 칸 기어간다."""
@@ -86,6 +86,7 @@ class Snake:
         elif self.direction == 'east':
             self.positions.append((y, x + 1))
 
+
 class Wall:
     """벽 클래스"""
     color = GRAY
@@ -94,11 +95,11 @@ class Wall:
         self.position = []
 
         for i in range(SCREEN_HEIGHT):
-            self.position.append((i+2, SCREEN_WIDTH/BLOCK_SIZE-1))
-            self.position.append((i+2, 0))
+            self.position.append((i + 2, SCREEN_WIDTH / BLOCK_SIZE - 1))
+            self.position.append((i + 2, 0))
 
         for k in range(SCREEN_WIDTH):
-            self.position.append((SCREEN_HEIGHT/BLOCK_SIZE-1, k))
+            self.position.append((SCREEN_HEIGHT / BLOCK_SIZE - 1, k))
             self.position.append((2, k))
 
     def draw(self, screen):
@@ -106,39 +107,62 @@ class Wall:
         for position in self.position:
             draw_block(screen, self.color, position)
 
+
 class Obstacle:
     """장애물 클래스"""
+
 
 class Apple:
     """사과 클래스"""
     color = RED  # 사과의 색
 
     def __init__(self, position=(5, 5)):
-
         self.position = position  # 사과의 위치
-
 
     def draw(self, screen):
         """사과를 화면에 그린다."""
         draw_block(screen, self.color, self.position)
 
 
+class Poison_apple(Apple):
+    """독사과 클래스"""
+    color = PURPLE  # 독사과의 색
+    poison_num = 0 # 독사과의 개수
+    poison_position = [] # 독사과의 위치
+
+    def __init__(self, point):
+        self.poison_position = []
+        self.poison_num = self.apple_count
+        for i  in range(self.poison_num):
+            self.poison_position.append((random.randint(3, 25), random.randint(1, 18)))
+
+
+
+
+
+
+
+
+
+
+
+
 class GameBoard:
     """게임판 클래스"""
-    width = 20   # 게임판의 너비
+    width = 20  # 게임판의 너비
     height = 20  # 게임판의 높이
-    apple_count = 0 # 먹은 사과의 개수
+    apple_count = 0  # 먹은 사과의 개수
 
     def __init__(self):
         self.snake = Snake()  # 게임판 위의 뱀
         self.apple = Apple()  # 게임판 위의 사과
-        self.wall =Wall()  # 게임판 위의 장애물
+        self.wall = Wall()  # 게임판 위의 장애물
 
     def draw(self, screen):
         """화면에 게임판의 구성요소를 그린다."""
         self.apple.draw(screen)  # 게임판 위의 사과를 그린다
         self.snake.draw(screen)  # 게임판 위의 뱀을 그린다
-        self.wall.draw(screen) # 게임판 위의 장애물을 그린
+        self.wall.draw(screen)  # 게임판 위의 장애물을 그린
 
     def count_apple(self):
         """사과 카운트 하나증가"""
@@ -154,9 +178,11 @@ class GameBoard:
         for position in self.snake.positions:  # ❸ 뱀 블록을 순회하면서
             if self.apple.position == position:  # 사과가 뱀 위치에 놓인 경우를 확인해
                 self.put_new_apple()  # 사과를 새로 놓는다
+                self.put_new_posion_apple() # 독사과를 새로 배치한다
                 break
-
-
+    def put_new_posion_apple(self):
+        """게임판에 독사과를 새로 놓는다"""
+        pass
 
     def process_turn(self):
         """게임을 한 차례 진행한다."""
@@ -174,14 +200,15 @@ class GameBoard:
 
         # 뱀의 머리가 벽과 부딛혓으면
         if self.snake.positions[0] in self.wall.position:
-            raise SnakeCollisionException()   # 뱀 충돌 예외를 일으킨다
+            raise SnakeCollisionException()  # 뱀 충돌 예외를 일으킨다
 
         # 사과가 벽과 접촉시
         if self.apple.position in self.wall.position:
             self.put_new_apple()
             self.decount_apple()
 
-
+        # 뱀의 머리가 독사과를 먹을시
+        if self.snake.positions[0] in self.
 
 
 class SnakeCollisionException(Exception):
@@ -206,16 +233,14 @@ def update_points(filed, point):
     font = pygame.font.Font(None, 30)
     input_box = pygame.Rect((0, 0), (SCREEN_WIDTH, 40))
     pygame.draw.rect(filed, BLACK, input_box)
-    text_surface = font.render("Points: "+ str(point),True, pygame.Color('lightskyblue3'))
-    filed.blit(text_surface, (input_box.x+10, input_box.y+10))
+    text_surface = font.render("Points: " + str(point), True, pygame.Color('lightskyblue3'))
+    filed.blit(text_surface, (input_box.x + 10, input_box.y + 10))
 
 
 pygame.init()
 
 # 지정한 크기의 게임 화면 창을 연다.
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-
 
 block_position = [0, 0]  # 블록의 위치 (y, x)
 last_moved_time = datetime.now()  # 마지막으로 블록을 움직인 때
@@ -231,7 +256,6 @@ DIRECTION_ON_KEY = {
 block_direction = 'east'  # 블록의 방향
 block_position = [0, 0]
 last_turn_time = datetime.now()
-
 
 game_board = GameBoard()  # 게임판 인스턴스를 생성한다
 

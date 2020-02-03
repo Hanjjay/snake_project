@@ -116,7 +116,7 @@ class Apple:
     """사과 클래스"""
     color = RED  # 사과의 색
 
-    def __init__(self, position=(5, 5)):
+    def __init__(self, position=(random.randint(3, 25), random.randint(1, 18))):
         self.position = position  # 사과의 위치
 
     def draw(self, screen):
@@ -127,25 +127,18 @@ class Apple:
 class Poison_apple(Apple):
     """독사과 클래스"""
     color = PURPLE  # 독사과의 색
-    poison_num = 0 # 독사과의 개수
-    poison_position = [] # 독사과의 위치
+    poison_num = 0  # 독사과의 개수
+    poison_position = []  # 독사과의 위치
 
-    def __init__(self, point):
+    def __init__(self, apple_count):
+        self.poison_num = apple_count
         self.poison_position = []
-        self.poison_num = self.apple_count
-        for i  in range(self.poison_num):
+        for i in range(self.poison_num):
             self.poison_position.append((random.randint(3, 25), random.randint(1, 18)))
 
-
-
-
-
-
-
-
-
-
-
+    def draw(self, screen):
+        """독사과를 화면에 그린"""
+        draw_block(screen, self.color, self.poison_position)
 
 class GameBoard:
     """게임판 클래스"""
@@ -157,6 +150,7 @@ class GameBoard:
         self.snake = Snake()  # 게임판 위의 뱀
         self.apple = Apple()  # 게임판 위의 사과
         self.wall = Wall()  # 게임판 위의 장애물
+        self.poison = Poison_apple(self.apple_count)  # 게임판 위의 독사과
 
     def draw(self, screen):
         """화면에 게임판의 구성요소를 그린다."""
@@ -180,6 +174,7 @@ class GameBoard:
                 self.put_new_apple()  # 사과를 새로 놓는다
                 self.put_new_posion_apple() # 독사과를 새로 배치한다
                 break
+
     def put_new_posion_apple(self):
         """게임판에 독사과를 새로 놓는다"""
         pass
@@ -208,7 +203,8 @@ class GameBoard:
             self.decount_apple()
 
         # 뱀의 머리가 독사과를 먹을시
-        if self.snake.positions[0] in self.
+        if self.snake.positions[0] in self.poison.poison_position:
+            self.decount_apple()
 
 
 class SnakeCollisionException(Exception):

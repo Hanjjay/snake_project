@@ -116,29 +116,32 @@ class Apple:
     """사과 클래스"""
     color = RED  # 사과의 색
 
-    def __init__(self, position=(random.randint(3, 25), random.randint(1, 18))):
-        self.position = position  # 사과의 위치
+    def __init__(self, apple_position=(random.randint(3, 25), random.randint(1, 18))):
+        self.apple_position = apple_position  # 사과의 위치
 
     def draw(self, screen):
         """사과를 화면에 그린다."""
-        draw_block(screen, self.color, self.position)
+        draw_block(screen, self.color, self.apple_position)
 
 
-class Poison_apple(Apple):
+class Poison_apple:
     """독사과 클래스"""
     color = PURPLE  # 독사과의 색
-    poison_num = 0  # 독사과의 개수
     poison_position = []  # 독사과의 위치
+    poison_apple_count = 0
 
     def __init__(self, apple_count):
-        self.poison_num = apple_count
         self.poison_position = []
-        for i in range(self.poison_num):
+        self.poison_apple_count = apple_count
+
+        for poison_pisiotno in range(self.poison_apple_count):
             self.poison_position.append((random.randint(3, 25), random.randint(1, 18)))
 
     def draw(self, screen):
-        """독사과를 화면에 그린"""
-        draw_block(screen, self.color, self.poison_position)
+        """독사과를 화면에 그린다"""
+        for poison_apple_positon in self.poison_position:
+            draw_block(screen, self.color, poison_apple_positon)
+
 
 class GameBoard:
     """게임판 클래스"""
@@ -150,13 +153,14 @@ class GameBoard:
         self.snake = Snake()  # 게임판 위의 뱀
         self.apple = Apple()  # 게임판 위의 사과
         self.wall = Wall()  # 게임판 위의 장애물
-        self.poison = Poison_apple(self.apple_count)  # 게임판 위의 독사과
+        self.poison_apple = Poison_apple(self.apple_count)  # 게임판 위의 독사과
 
     def draw(self, screen):
         """화면에 게임판의 구성요소를 그린다."""
         self.apple.draw(screen)  # 게임판 위의 사과를 그린다
         self.snake.draw(screen)  # 게임판 위의 뱀을 그린다
         self.wall.draw(screen)  # 게임판 위의 장애물을 그린
+        self.poison_apple.draw(screen)  # 게임판 위의 독사과를 그린
 
     def count_apple(self):
         """사과 카운트 하나증가"""
@@ -169,15 +173,19 @@ class GameBoard:
     def put_new_apple(self):
         """게임판에 새 사과를 놓는다."""
         self.apple = Apple((random.randint(3, 25), random.randint(1, 18)))
-        for position in self.snake.positions:  # ❸ 뱀 블록을 순회하면서
-            if self.apple.position == position:  # 사과가 뱀 위치에 놓인 경우를 확인해
+        for snake_position in self.snake.positions:  # ❸ 뱀 블록을 순회하면서
+            if self.apple.apple_position == snake_position:  # 사과가 뱀 위치에 놓인 경우를 확인해
                 self.put_new_apple()  # 사과를 새로 놓는다
-                self.put_new_posion_apple() # 독사과를 새로 배치한다
+                self.put_new_posionapple()  # 독사과를 새로 배치한다
                 break
 
-    def put_new_posion_apple(self):
+    def put_new_posionapple(self):
         """게임판에 독사과를 새로 놓는다"""
-        pass
+        self.poison_apple = Poison_apple(self.apple_count)
+        for snake_position in self.snake.positions:
+            if self.poison_apple.poison_position == snake_position:
+                self.put_new_posion_apple()
+                break
 
     def process_turn(self):
         """게임을 한 차례 진행한다."""
@@ -188,7 +196,7 @@ class GameBoard:
             raise SnakeCollisionException()  # 뱀 충돌 예외를 일으킨다
 
         # 뱀의 머리가 사과를 먹으면
-        if self.snake.positions[0] == self.apple.position:
+        if self.snake.positions[0] == self.apple.apple_position:
             self.snake.grow()  # 뱀을 자라게 한다
             self.put_new_apple()  # 새로운 사과를 나둔다
             self.count_apple()  # 카운트 하나 증가시킨다
@@ -198,13 +206,18 @@ class GameBoard:
             raise SnakeCollisionException()  # 뱀 충돌 예외를 일으킨다
 
         # 사과가 벽과 접촉시
-        if self.apple.position in self.wall.position:
+        if self.apple.apple_position in self.wall.position:
             self.put_new_apple()
             self.decount_apple()
 
         # 뱀의 머리가 독사과를 먹을시
-        if self.snake.positions[0] in self.poison.poison_position:
+        if self.snake.positions[0] in self.poison_apple.poison_position:
             self.decount_apple()
+
+        # 사고와 독사과가 겹칠시
+        if self.apple.apple_position in self.poison_apple.poison_position:
+            self.put_new_apple()
+            self.put_new_posionapple()
 
 
 class SnakeCollisionException(Exception):

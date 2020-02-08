@@ -108,8 +108,17 @@ class Wall:
             draw_block(screen, self.color, position)
 
 
-class Obstacle:
+class Obstacle(Wall):
     """장애물 클래스"""
+    obstacle_count = 0
+
+    def added_obstacle(self):
+        self.position.append((random.randint(3, 25), random.randint(1, 18)))
+        self.obstacle_count += 1
+
+    def draw(self, screen):
+        for obstacle_position in self.obstacle_count:
+            draw_block(screen, self.color, obstacle_position)
 
 
 class Apple:
@@ -154,6 +163,7 @@ class GameBoard:
         self.apple = Apple()  # 게임판 위의 사과
         self.wall = Wall()  # 게임판 위의 장애물
         self.poison_apple = Poison_apple(self.apple_count)  # 게임판 위의 독사과
+        self.obstacle = Obstacle()  # 게임판 위의 장애물
 
     def draw(self, screen):
         """화면에 게임판의 구성요소를 그린다."""
@@ -161,8 +171,11 @@ class GameBoard:
         self.snake.draw(screen)  # 게임판 위의 뱀을 그린다
         self.wall.draw(screen)  # 게임판 위의 장애물을 그린
         self.poison_apple.draw(screen)  # 게임판 위의 독사과를 그린
+        self.obstacle.draw(screen)  # 게임판 위의 장애물
+
 
     def count_apple(self):
+
         """사과 카운트 하나증가"""
         self.apple_count += 1
 
@@ -176,7 +189,6 @@ class GameBoard:
         for snake_position in self.snake.positions:  # ❸ 뱀 블록을 순회하면서
             if self.apple.apple_position == snake_position:  # 사과가 뱀 위치에 놓인 경우를 확인해
                 self.put_new_apple()  # 사과를 새로 놓는다
-                self.put_new_posionapple()  # 독사과를 새로 배치한다
                 break
 
     def put_new_posionapple(self):
@@ -200,6 +212,7 @@ class GameBoard:
             self.snake.grow()  # 뱀을 자라게 한다
             self.put_new_apple()  # 새로운 사과를 나둔다
             self.count_apple()  # 카운트 하나 증가시킨다
+            self.put_new_posionapple()  # 독사과를 다시 배치한
 
         # 뱀의 머리가 벽과 부딛혓으면
         if self.snake.positions[0] in self.wall.position:
@@ -213,11 +226,20 @@ class GameBoard:
         # 뱀의 머리가 독사과를 먹을시
         if self.snake.positions[0] in self.poison_apple.poison_position:
             self.decount_apple()
+            self.put_new_posionapple()
 
         # 사고와 독사과가 겹칠시
         if self.apple.apple_position in self.poison_apple.poison_position:
             self.put_new_apple()
             self.put_new_posionapple()
+
+        #  사과 카운팅이 3의 배수가 될시
+        if self.apple_count == 0:
+            pass
+        elif self.apple_count % 3 == 0:
+            self.obstacle.added_obstacle()
+        else:
+            pass
 
 
 class SnakeCollisionException(Exception):

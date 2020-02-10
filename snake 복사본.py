@@ -90,6 +90,7 @@ class Snake:
 class Wall:
     """벽 클래스"""
     color = GRAY
+    position = []
 
     def __init__(self):
         self.position = []
@@ -102,23 +103,10 @@ class Wall:
             self.position.append((SCREEN_HEIGHT / BLOCK_SIZE - 1, k))
             self.position.append((2, k))
 
-    def draw(self, screen):
+    def draw(self, game_screen):
         """장애물을 화면에 그린다."""
         for position in self.position:
-            draw_block(screen, self.color, position)
-
-
-class Obstacle(Wall):
-    """장애물 클래스"""
-    obstacle_count = 0
-
-    def added_obstacle(self):
-        self.position.append((random.randint(3, 25), random.randint(1, 18)))
-        self.obstacle_count += 1
-
-    def draw(self, screen):
-        for obstacle_position in self.obstacle_count:
-            draw_block(screen, self.color, obstacle_position)
+            draw_block(game_screen, self.color, position)
 
 
 class Apple:
@@ -143,13 +131,32 @@ class Poison_apple:
         self.poison_position = []
         self.poison_apple_count = apple_count
 
-        for poison_pisiotno in range(self.poison_apple_count):
+        for poison_poisiotno in range(self.poison_apple_count):
             self.poison_position.append((random.randint(3, 25), random.randint(1, 18)))
 
     def draw(self, screen):
         """독사과를 화면에 그린다"""
         for poison_apple_positon in self.poison_position:
             draw_block(screen, self.color, poison_apple_positon)
+
+
+class Obstacle:
+    """장애물 클래스"""
+    color = GRAY  # 독사과의 색
+    obstacle_position = []  # 독사과의 위치
+    obstacle_count = 0
+
+    def __init__(self, apple_count):
+        self.obstacle_position_position = [(8,16)]
+        self.obstacle_position = apple_count
+
+        for poison_position in range(self.obstacle_count):
+            self.obstacle_position.append((random.randint(3, 25), random.randint(1, 18)))
+
+    def draw(self, screen):
+        """장애물을 화면에 그린다"""
+        for obstacle_position in range(self.obstacle_position):
+            draw_block(screen, self.color, self.obstacle_position)
 
 
 class GameBoard:
@@ -163,7 +170,7 @@ class GameBoard:
         self.apple = Apple()  # 게임판 위의 사과
         self.wall = Wall()  # 게임판 위의 장애물
         self.poison_apple = Poison_apple(self.apple_count)  # 게임판 위의 독사과
-        self.obstacle = Obstacle()  # 게임판 위의 장애물
+        self.obstacle = Obstacle(self.apple_count)  # 게임판 위의 장애물
 
     def draw(self, screen):
         """화면에 게임판의 구성요소를 그린다."""
@@ -173,9 +180,7 @@ class GameBoard:
         self.poison_apple.draw(screen)  # 게임판 위의 독사과를 그린
         self.obstacle.draw(screen)  # 게임판 위의 장애물
 
-
     def count_apple(self):
-
         """사과 카운트 하나증가"""
         self.apple_count += 1
 
@@ -197,6 +202,13 @@ class GameBoard:
         for snake_position in self.snake.positions:
             if self.poison_apple.poison_position == snake_position:
                 self.put_new_posion_apple()
+                break
+
+    def put_new_obstacle(self):
+        self.obstacle = Obstacle(self.apple_count)
+        for snake_position in self.snake.positions:
+            if self.poison_apple.poison_position == snake_position:
+                self.put_new_obstacle()
                 break
 
     def process_turn(self):
@@ -237,7 +249,7 @@ class GameBoard:
         if self.apple_count == 0:
             pass
         elif self.apple_count % 3 == 0:
-            self.obstacle.added_obstacle()
+            self.put_new_obstacle()
         else:
             pass
 

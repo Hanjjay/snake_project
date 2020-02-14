@@ -147,16 +147,16 @@ class Obstacle:
     obstacle_count = 0
 
     def __init__(self, apple_count):
-        self.obstacle_position_position = [(8,16)]
-        self.obstacle_position = apple_count
+        self.obstacle_position_position = []
+        self.obstacle_count = int(apple_count/3)
 
         for poison_position in range(self.obstacle_count):
             self.obstacle_position.append((random.randint(3, 25), random.randint(1, 18)))
 
     def draw(self, screen):
         """장애물을 화면에 그린다"""
-        for obstacle_position in range(self.obstacle_position):
-            draw_block(screen, self.color, self.obstacle_position)
+        for obstacle_position_counting in self.obstacle_position:
+            draw_block(screen, self.color, obstacle_position_counting)
 
 
 class GameBoard:

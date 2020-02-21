@@ -248,10 +248,11 @@ class GameBoard:
         #  사과 카운팅이 3의 배수가 될시
         if self.apple_count == 0:
             pass
-        elif self.apple_count % 3 == 0:
+        elif (self.apple_count % 3 == 0) and (len(self.obstacle.obstacle_position) != int(self.apple_count/3)):
             self.put_new_obstacle()
+
         else:
-            pass
+             pass
 
 
 class SnakeCollisionException(Exception):

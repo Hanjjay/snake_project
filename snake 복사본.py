@@ -147,7 +147,7 @@ class Obstacle:
     obstacle_count = 0
 
     def __init__(self, apple_count):
-        self.obstacle_position_position = []
+        self.obstacle_position = []
         self.obstacle_count = int(apple_count/3)
 
         for poison_position in range(self.obstacle_count):
@@ -156,7 +156,7 @@ class Obstacle:
     def draw(self, screen):
         """장애물을 화면에 그린다"""
         for obstacle_position_counting in self.obstacle_position:
-            draw_block(screen, self.color, obstacle_position_counting)
+            draw_block(screen, self.color, (obstacle_position_counting))
 
 
 class GameBoard:
@@ -227,11 +227,11 @@ class GameBoard:
             self.put_new_posionapple()  # 독사과를 다시 배치한
 
         # 뱀의 머리가 벽과 부딛혓으면
-        if self.snake.positions[0] in self.wall.position:
+        if (self.snake.positions[0] in self.wall.position) or (self.snake.positions[0] in self.obstacle.obstacle_position):
             raise SnakeCollisionException()  # 뱀 충돌 예외를 일으킨다
 
         # 사과가 벽과 접촉시
-        if self.apple.apple_position in self.wall.position:
+        if (self.apple.apple_position in self.wall.position) or (self.snake.positions[0] in self.obstacle.obstacle_position):
             self.put_new_apple()
             self.decount_apple()
 
@@ -248,7 +248,7 @@ class GameBoard:
         #  사과 카운팅이 3의 배수가 될시
         if self.apple_count == 0:
             pass
-        elif (self.apple_count % 3 == 0) and (len(self.obstacle.obstacle_position) != int(self.apple_count/3)):
+        elif (self.apple_count % 3 == 0) and (len(self.obstacle.obstacle_position) <= int(self.apple_count/3)):
             self.put_new_obstacle()
 
         else:
